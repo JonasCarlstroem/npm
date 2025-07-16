@@ -12,6 +12,11 @@ struct registry_service_configuration {
 class registry_service : public svc::service_base {
   public:
     registry_service() : service_base("NpmRegistryService") {}
+    registry_service(registry_service_configuration* config, logging::logger* logger)
+        : service_base("NpmRegistryService"),
+          logger_(logger) {
+        use_ip_and_port(config->ip_address, config->port);
+    }
     registry_service(const string &ip, int port)
         : service_base("NpmRegistryService") {
         use_ip_and_port(
@@ -38,6 +43,7 @@ class registry_service : public svc::service_base {
     int listening_port       = 8080;
     std::unique_ptr<registry> npm_registry;
     std::thread registry_thread;
+    logging::logger* logger_ = nullptr;
 
     void main_loop() override {
         npm_registry = std::make_unique<registry>(listening_ip, listening_port);
