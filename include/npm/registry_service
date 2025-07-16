@@ -1,0 +1,4 @@
+#pragma once
+
+#include "../../npm_registry_service.hpp"
+using npm_registry_service = npm::registry_service;
