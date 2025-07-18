@@ -1,8 +1,11 @@
 #pragma once
-#include "npm_package_storage.hpp"
+// std
 #include <filesystem>
+
+// lib
 #include <net/server/http>
 #include <utils/net>
+#include "npm_package_storage.hpp"
 
 using namespace std::filesystem;
 using namespace net;
@@ -18,14 +21,12 @@ class registry {
         return path(name + "-" + version + ".tgz");
     }
 
-    static string
-    tarball_url(const string& host, const string& name, const string& file) {
+    static string tarball_url(const string& host, const string& name, const string& file) {
         return (path("http:/") / host / name / "-" / file).string();
     }
 
   public:
-    registry(const string& ip = "127.0.0.1", int port = 8080)
-        : server(ip, port) {
+    registry(const string& ip = "127.0.0.1", int port = 8080) : server(ip, port) {
         server.get("/:name", get_package_metadata);
         server.get("/:name/-/:file", get_package_tarball);
         server.get("/-/v1/search", get_search);
@@ -54,10 +55,9 @@ class registry {
         try {
             auto meta   = package_storage::load_metadata(name);
 
-            string host = req.headers.count("host") ? req.headers.at("host")
-                                                    : "localhost:8080";
+            string host = req.headers.count("host") ? req.headers.at("host") : "localhost:8080";
             for (auto& [version, vmeta] : meta["versions"].items()) {
-                string file = tarball_full_path(name, version).string();
+                string file              = tarball_full_path(name, version).string();
                 vmeta["dist"]["tarball"] = tarball_url(host, name, file);
             }
 
@@ -89,8 +89,7 @@ class registry {
     static http::response get_packages(const http::request& req) {
         json list = json::array();
 
-        for (const auto& entry :
-             ::directory_iterator(package_storage::base_path)) {
+        for (const auto& entry : ::directory_iterator(package_storage::base_path)) {
             if (entry.is_directory()) {
                 list.push_back(entry.path().filename().string());
             }
@@ -107,8 +106,7 @@ class registry {
         json results;
         results["objects"] = json::array();
 
-        for (const auto& entry :
-             std::filesystem::directory_iterator(package_storage::base_path)) {
+        for (const auto& entry : std::filesystem::directory_iterator(package_storage::base_path)) {
             if (!entry.is_directory())
                 continue;
 
@@ -126,11 +124,10 @@ class registry {
                 package["name"]        = name;
                 package["version"]     = latest;
                 package["description"] = version_info.value("description", "");
-                package["keywords"] =
-                    version_info.value("keywords", json::array());
+                package["keywords"]    = version_info.value("keywords", json::array());
 
-                obj["package"]        = package;
-                obj["score"]["final"] = 1.0;
+                obj["package"]         = package;
+                obj["score"]["final"]  = 1.0;
                 results["objects"].push_back(obj);
             } catch (...) {
             }
@@ -187,9 +184,7 @@ class registry {
             path dir                 = package_storage::get_path(name);
             ::create_directories(dir);
 
-            std::ofstream tarout(
-                path(dir) / file_name.filename(), std::ios::binary
-            );
+            std::ofstream tarout(path(dir) / file_name.filename(), std::ios::binary);
             tarout.write(decoded_tarball.data(), decoded_tarball.size());
 
             json meta;

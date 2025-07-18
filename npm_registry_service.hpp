@@ -1,5 +1,11 @@
 #pragma once
+// std
+
+// lib
 #include "npm_registry.hpp"
+
+// deps
+#include <logging/logger>
 #include <service>
 
 namespace npm {
@@ -13,24 +19,20 @@ class registry_service : public svc::service_base {
   public:
     registry_service() : service_base("NpmRegistryService") {}
     registry_service(registry_service_configuration* config, logging::logger* logger)
-        : service_base("NpmRegistryService"),
-          logger_(logger) {
+        : service_base("NpmRegistryService"), logger_(logger) {
         use_ip_and_port(config->ip_address, config->port);
     }
-    registry_service(const string &ip, int port)
-        : service_base("NpmRegistryService") {
-        use_ip_and_port(
-            !ip.empty() ? ip : listening_ip,
-            port > 0 && port < 65535 ? port : listening_port
-        );
+    registry_service(const string& ip, int port) : service_base("NpmRegistryService") {
+        use_ip_and_port(!ip.empty() ? ip : listening_ip,
+                        port > 0 && port < 65535 ? port : listening_port);
     }
 
-    void use_ip_and_port(const string &ip, int port) {
+    void use_ip_and_port(const string& ip, int port) {
         use_ip(ip);
         use_port(port);
     }
 
-    void use_ip(const string &ip) { listening_ip = ip; }
+    void use_ip(const string& ip) { listening_ip = ip; }
 
     void use_port(int port) {
         if (port < 1 || port > 65535)
@@ -52,12 +54,9 @@ class registry_service : public svc::service_base {
 
         try {
             npm_registry->start();
-        } catch (const std::exception &ex) {
-            log_event(
-                EVENTLOG_ERROR_TYPE,
-                string("Server error: ") +
-                    string(ex.what(), ex.what() + strlen(ex.what()))
-            );
+        } catch (const std::exception& ex) {
+            log_event(EVENTLOG_ERROR_TYPE,
+                      string("Server error: ") + string(ex.what(), ex.what() + strlen(ex.what())));
         }
 
         if (service_mode) {
