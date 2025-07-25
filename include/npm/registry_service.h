@@ -2,11 +2,11 @@
 // std
 
 // lib
-#include "npm_registry.hpp"
+#include "registry.h"
 
 // deps
-#include <logging/logger>
-#include <service>
+#include <logging/logger.h>
+#include <service/base.h>
 
 namespace npm {
 

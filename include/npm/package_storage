@@ -1,4 +1,0 @@
-#pragma once
-
-#include "../../npm_package_storage.hpp"
-using npm_package_storage = npm::package_storage;

@@ -3,9 +3,9 @@
 #include <filesystem>
 
 // lib
-#include <net/server/http>
-#include <utils/net>
-#include "npm_package_storage.hpp"
+#include <net/http/server.h>
+#include <utils/net.h>
+#include "package_storage.h"
 
 using namespace std::filesystem;
 using namespace net;
